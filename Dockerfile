@@ -22,6 +22,14 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
 
 RUN npm install && npm run build
 
+# Ensure the SQLite database file exists and the storage/bootstrap cache dirs are writable
+RUN mkdir -p database \
+    && touch database/database.sqlite \
+    && mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache database
+
 EXPOSE 10000
 
-CMD php artisan migrate --force && php artisan storage:link && php artisan serve --host 0.0.0.0 --port 10000
+CMD php artisan migrate --force \
+    && php artisan storage:link \
+    && php artisan serve --host 0.0.0.0 --port 10000
